@@ -237,8 +237,8 @@ export default function TimetableGenerator({
           />
           <h2 className="text-lg font-semibold">Department of {branch}</h2>
           <div className="flex justify-between items-center text-sm">
-            <span>Semester: {semester}</span>
-            <span>Section: {section}</span>
+            <span>Semester: {semester} | Section: {section}</span>
+           
             <span>Room No: {lecturers[0]?.room_no || "N/A"}</span>
             <span>Date: {new Date().toLocaleDateString()}</span>
           </div>

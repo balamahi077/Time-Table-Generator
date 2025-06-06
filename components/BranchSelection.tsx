@@ -12,12 +12,12 @@ interface BranchSelectionProps {
 export default function BranchSelection({ onSelect, onBack }: BranchSelectionProps) {
   const branches: Branch[] = [
     // Undergraduate
-    { category: "undergraduate", name: "Computer Science & Engineering", code: "CSE" },
+    { category: "undergraduate", name: "Computer Science and Engineering", code: "CSE" },
     { category: "undergraduate", name: "Mechanical Engineering", code: "ME" },
-    { category: "undergraduate", name: "Electronics & Communication Engineering", code: "ECE" },
-    { category: "undergraduate", name: "Electrical & Electronics Engineering", code: "EEE" },
+    { category: "undergraduate", name: "Electronics and Communication Engineering", code: "ECE" },
+    { category: "undergraduate", name: "Electrical and Electronics Engineering", code: "EEE" },
     { category: "undergraduate", name: "Civil Engineering", code: "CE" },
-    { category: "undergraduate", name: "Artificial Intelligence & Machine Learning", code: "AIML" },
+    { category: "undergraduate", name: "Artificial Intelligence and Machine Learning", code: "AIML" },
     // Postgraduate
     { category: "postgraduate", name: "Masters in Business Administration", code: "MBA" },
   ]

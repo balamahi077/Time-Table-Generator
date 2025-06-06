@@ -20,12 +20,12 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
   const [isEditing, setIsEditing] = useState(false);
 
   const branches = [
-    "Computer Science & Engineering",
+    "Computer Science and Engineering",
     "Mechanical Engineering",
-    "Electronics & Communication Engineering",
-    "Electrical & Electronics Engineering",
+    "Electronics and Communication Engineering",
+    "Electrical and Electronics Engineering",
     "Civil Engineering",
-    "Artificial Intelligence & Machine Learning",
+    "Artificial Intelligence and Machine Learning",
     "Masters in Business Administration",
   ]
 
@@ -62,30 +62,36 @@ const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
   };
 
           useEffect(() => {
-    const fetchTimetables = async () => {
-      if (selectedBranch && selectedSemester && selectedSection) {
-        try {
-          const tableName = `${selectedBranch}_${selectedSemester}th_sem_${selectedSection}_section`;
-          const url = `/api/timetable?tableName=${tableName}&branch=${selectedBranch}&semester=${selectedSemester}&section=${selectedSection}`;
-          const response = await fetch(url);
+  const fetchTimetables = async () => {
+    if (selectedBranch && selectedSemester && selectedSection) {
+      try {
+        const tableName = `${selectedBranch}_${selectedSemester}th_sem_${selectedSection.toLowerCase()}_section`;
+        const url = `/api/timetable?tableName=${tableName}&branch=${selectedBranch}&semester=${selectedSemester}&section=${selectedSection}`;
+        
+        const response = await fetch(url);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-            console.error("Not found!!");
-          }
-
-          const data = await response.json();
-          setAllTimetables(data);
-          setTransformedData(transformTimetableData(data));
-        } catch (error) {
-          console.error("Failed to fetch timetables:", error);
-          // Handle error appropriately (e.g., display an error message)
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          console.warn(`Timetable fetch failed: ${response.status} - ${errorMessage}`);
+          setAllTimetables([]);
+          setTransformedData({});
+          return;
         }
-      }
-    };
 
-    fetchTimetables();
-  }, [selectedBranch, selectedSemester, selectedSection]);
+        const data = await response.json();
+        setAllTimetables(data);
+        setTransformedData(transformTimetableData(data));
+      } catch (error) {
+        console.error("Error while fetching timetables:", error);
+        setAllTimetables([]);
+        setTransformedData({});
+      }
+    }
+  };
+
+  fetchTimetables();
+}, [selectedBranch, selectedSemester, selectedSection]);
+
 
  const timeSlots = [
   "9:30-10:30",
