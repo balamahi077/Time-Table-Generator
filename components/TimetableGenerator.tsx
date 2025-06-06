@@ -79,7 +79,7 @@ export default function TimetableGenerator({
 
   const fetchTimetable = async () => {
     try {
-      const tableName = `${semester}th_sem_${section.toLowerCase()}_section`;
+      const tableName = `${branch}_${semester}th_sem_${section.toLowerCase()}_section`;
       const response = await fetch(
         `/api/timetable?branch=${encodeURIComponent(branch)}&semester=${semester}&section=${section}&tableName=${tableName}`,
       );
@@ -114,7 +114,7 @@ export default function TimetableGenerator({
     if (!lecturer) return;
 
     try {
-      const tableName = `${semester}th_sem_${section.toLowerCase()}_section`;
+      const tableName = `${branch}_${semester}th_sem_${section.toLowerCase()}_section`;
 
       // Prepare entries for all combined hours
       const entries: TimetableEntry[] = [];
@@ -348,6 +348,11 @@ export default function TimetableGenerator({
             <Button onClick={onBack} variant="outline">
               Back
             </Button>
+            <Button onClick={fetchTimetable} variant="outline">
+            🔄 Refresh
+            </Button>
+
+
           </div>
         </CardContent>
       </Card>
@@ -432,7 +437,7 @@ export default function TimetableGenerator({
       </Dialog>
 
       {/* Subject Details */}
-      <Card className="print:hidden">
+      <Card className="print:shadow-none">
         <CardHeader>
           <CardTitle>Subject Details</CardTitle>
         </CardHeader>
@@ -456,7 +461,7 @@ export default function TimetableGenerator({
 
       {/* Lab Details */}
       {labs.length > 0 && (
-        <Card className="print:hidden">
+        <Card className="print:shadow-none">
           <CardHeader>
             <CardTitle>Lab Details</CardTitle>
           </CardHeader>

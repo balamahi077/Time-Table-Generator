@@ -32,8 +32,18 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   const transformTimetableData = (timetables: any[]) => {
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const timeSlots = ["9:30-10:30", "10:30-11:20", "11:30-12:30", "12:30-1:20", "2:20-3:20", "3:20-4:20", "4:20-5:05"];
+   const timeSlots = [
+  "9:30-10:30",
+  "10:30-11:20",
+  "Break",
+  "11:30-12:30",
+  "12:30-1:20",
+  "Lunch Break",
+  "2:20-3:20",
+  "3:20-4:20",
+  "4:20-5:05",
+];
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     const transformedData: { [day: string]: { [timeSlot: string]: any } } = {};
 
@@ -55,7 +65,7 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
     const fetchTimetables = async () => {
       if (selectedBranch && selectedSemester && selectedSection) {
         try {
-          const tableName = `${selectedSemester}th_sem_${selectedSection}_section`;
+          const tableName = `${selectedBranch}_${selectedSemester}th_sem_${selectedSection}_section`;
           const url = `/api/timetable?tableName=${tableName}&branch=${selectedBranch}&semester=${selectedSemester}&section=${selectedSection}`;
           const response = await fetch(url);
 
@@ -77,8 +87,18 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
     fetchTimetables();
   }, [selectedBranch, selectedSemester, selectedSection]);
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const timeSlots = ["9:30-10:30", "10:30-11:20", "11:30-12:30", "12:30-1:20", "2:20-3:20", "3:20-4:20", "4:20-5:05"];
+ const timeSlots = [
+  "9:30-10:30",
+  "10:30-11:20",
+  "Break",
+  "11:30-12:30",
+  "12:30-1:20",
+  "Lunch Break",
+  "2:20-3:20",
+  "3:20-4:20",
+  "4:20-5:05",
+];
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   return (
     <div className="space-y-6">
@@ -148,50 +168,94 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
                 Timetables for {selectedBranch} - Semester {selectedSemester} - Section {selectedSection}
               </h3>
               {allTimetables.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="table-auto w-full">
-                    <thead>
-                      <tr>
-                        <th className="px-4 py-2">Day/Time</th>
-                        {timeSlots.map((timeSlot) => (
-                          <th key={timeSlot} className="px-4 py-2">{timeSlot}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {days.map((day) => (
-                        <tr key={day}>
-                          <td className="border px-4 py-2">{day}</td>
-                          {timeSlots.map((timeSlot) => {
-                            const timetable = transformedData[day][timeSlot];
-                            return (
-                              <td key={timeSlot} className="border px-4 py-2">
-                                {timetable ? (
-                                  <>
-                                    <input
-                                      type="text"
-                                      value={timetable.subject_name}
-                                      className="  py-0.5 w-full"
-                                      readOnly={!isEditing}
-                                    />
-                                    <input
-                                      type="text"
-                                      value={timetable.lecturer_name}
-                                      className="   w-full"
-                                      readOnly={!isEditing}
-                                    />
-                                  </>
-                                ) : (
-                                  "-"
-                                )}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+  <div className="overflow-x-auto">
+    <table className="w-full border-collapse border border-gray-300">
+      <thead>
+        <tr>
+          <th className="border border-gray-300 p-2 bg-gray-100">Day/Time</th>
+          {timeSlots.map((slot) => (
+            <th key={slot} className="border border-gray-300 p-2 bg-gray-100 text-xs">
+              {slot}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {days.map((day) => (
+          <tr key={day}>
+            <td className="border border-gray-300 p-2 font-medium bg-gray-50">{day}</td>
+            {timeSlots.map((timeSlot, i) => {
+              const entry = allTimetables.find(
+                (t) => t.day === day && t.time_slot === timeSlot
+              );
+              const isBreak = timeSlot === "Break" || timeSlot === "Lunch Break";
+
+              // Skip rendering if it's a continuation of a lab block
+              if (entry?.is_lab) {
+                const prevSlot = timeSlots[i - 1];
+                const prevEntry = allTimetables.find(
+                  (t) => t.day === day && t.time_slot === prevSlot
+                );
+                if (
+                  prevEntry &&
+                  prevEntry.is_lab &&
+                  prevEntry.subject_code === entry.subject_code &&
+                  prevEntry.lecturer_name === entry.lecturer_name
+                ) {
+                  return null;
+                }
+              }
+
+              // Calculate colSpan for labs
+              let colSpan = 1;
+              if (entry?.is_lab) {
+                for (let j = 1; j <= 3 && i + j < timeSlots.length; j++) {
+                  const nextSlot = timeSlots[i + j];
+                  const nextEntry = allTimetables.find(
+                    (t) => t.day === day && t.time_slot === nextSlot
+                  );
+                  if (
+                    nextEntry &&
+                    nextEntry.is_lab &&
+                    nextEntry.subject_code === entry.subject_code &&
+                    nextEntry.lecturer_name === entry.lecturer_name
+                  ) {
+                    colSpan++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+
+              return (
+                <td
+                  key={`${day}-${timeSlot}`}
+                  colSpan={colSpan}
+                  className={`border border-gray-300 p-2 text-xs ${
+                    isBreak ? "bg-gray-200 text-center font-medium" : ""
+                  }`}
+                >
+                  {isBreak ? (
+                    <div className="transform -rotate-90 text-xs">{timeSlot}</div>
+                  ) : entry ? (
+                    <>
+                      <div className="font-medium">{entry.subject_name}</div>
+                      <div className="text-gray-600">{entry.lecturer_name}</div>
+                      {entry.is_lab && <div className="text-blue-600">LAB</div>}
+                    </>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+
               ) : (
                 <p>No timetables found.</p>
               )}
@@ -215,3 +279,14 @@ export default function AdminPanel({ onBack, branch, semester }: AdminPanelProps
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
