@@ -28,9 +28,19 @@ export default function Home() {
         {/* Welcome Page */}
         {currentStep === 0 && (
           <Card className="text-center py-16">
+          
+          <div className="flex items-center gap-6 animate-fade-in mt-8 mb-8 mx-auto w-fit">
+          <img src="/pdit.jpg" alt="PDIT Logo" className="h-16 w-16 object-contain"></img>
+  
+          <img src="/name.png" alt="PDIT Logo" className="h-20 w-105 object-contain"></img>
+  
+          <img src="/nacc.png" alt="NAAC Logo" className="h-20 w-20 object-contain mr-1"></img>
+          </div>
+
+          
             <CardHeader>
               <CardTitle className="text-4xl font-bold text-blue-800 mb-4">Welcome to Time Table Generator</CardTitle>
-              <p className="text-lg text-gray-600 mb-8">PROUDHADEVARAYA INSTITUTE OF TECHNOLOGY</p>
+              {/* <p className="text-lg text-gray-600 mb-8">PROUDHADEVARAYA INSTITUTE OF TECHNOLOGY</p> */}
             </CardHeader>
             <CardContent className="space-y-4">
               <Button onClick={() => setCurrentStep(1)} className="px-8 py-3 text-lg" size="lg">
